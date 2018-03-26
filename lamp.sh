@@ -39,7 +39,8 @@ elif [[ "$1" -eq 'help' ]];then
 exit
 elif [[ "$1" -eq 1 ]];then
 	wget -c $H_URL/$H_FILES && tar -xf $H_FILES && cd $H_FILES_DIR;
-	./configure --prefix=$H_PREFIX --with-include-apr --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util --with-pcre=/usr/local/pcre  
+	./configure --prefix=$H_PREFIX --with-include-apr --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util --with-pcre=/usr/local/pcre  --with-included-apr
+	./configure --prefix=/usr/local/apache2 --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util/ --with-pcre=/usr/local/pcre --enable-mods-shared=most --enable-so --with-included-apr
 	if [[ "$?" -eq 0 ]]; then
 		make && make install
 		echo "\033[32mThe $H_FILES_DIR install success\033[0m"
