@@ -40,22 +40,25 @@ elif [[ "$1" -eq 'help' ]];then
 	echo "4)配置 index.php 并启动 LAMP 服务"
 	echo -e "\033[31mUsage: { /bin/sh $0 1|2|3|4|help}\033[0m"
 exit
+#apache 安装
 elif [[ "$1" -eq 1 ]];then
 	wget -c $H_URL/$H_FILES && tar -xf $H_FILES && cd $H_FILES_DIR;
 	#http 用你下载的版本文件夹
-	cp -r apr-1.6.2 ${SRC_DIR}/${H_FILES_DIR}/srclib/apr
-	cp -r apr-util-1.6.1 ${SRC_DIR}/${H_FILES_DIR}/srclib/apr-util
+	cp -r ${SRC_DIR}/apr-1.6.2 ${SRC_DIR}/${H_FILES_DIR}/srclib/apr
+	cp -r ${SRC_DIR}/apr-util-1.6.1 ${SRC_DIR}/${H_FILES_DIR}/srclib/apr-util
 	./configure --prefix=/usr/local/apache --with-apr=/usr/local/apr --with-apr-util=/usr/local/apr-util/ --with-pcre=/usr/local/pcre --enable-mods-shared=most --enable-so --with-included-apr
 	if [[ "$?" -eq 0 ]]; then
 		make && make install
 		ln -s /usr/local/apache/bin/apachectl /etc/init.d/httpd 
+		sed -i 's/#ServerNam/ServerNam/' /usr/local/apache/conf/httpd.conf 
+		echo 'AddType application/x-httpd-php .php'>>/usr/local/apache/conf/httpd.conf 
 		echo -e "\033[32mThe $H_FILES_DIR install success\033[0m"
 	else
 		echo -e "\033[31mThe $H_FILES_DIR install error,Please check\033[0m"
 		exit
 	fi
-fi 
-elif [[ "$1" -eq 2 ]];then
+#Mysql 安装 建议用apt 或yum 安装
+elif [[ "$1" -eq 20 ]];then
 	wget -c $M_URL/$M_FILES && tar -xf $M_FILES && cd $M_FILES_DIR;
 	apt-get install cmake
 	#centos yum install cmake
@@ -79,10 +82,22 @@ elif [[ "$1" -eq 2 ]];then
 	-DWITH_EMBEDDED_SERVER=1 
 	if [[ "$?" -eq 0 ]]; then
 		make && make install
-		ln -s /usr/local/apache/bin/apachectl /etc/init.d/httpd 
 		echo -e "\033[32mThe $M_FILES_DIR install success\033[0m"
 	else
 		echo -e "\033[31mThe $M_FILES_DIR install error,Please check\033[0m"
+		exit
+	fi
+#安装php
+elif [[ "$1" -eq 3 ]];then
+	wget -c $P_URL/$P_FILES && tar -xf $P_FILES && cd $P_FILES_DIR;
+	apt-get install libxml2
+	apt-get install libxml2-dev
+	./configure --prefix=${P_PREFIX} --with-config-file-path=${P_PREFIX}/etc/ --with-apxs2=${P_PREFIX}/bin/apxs
+	if [[ "$?" -eq 0 ]]; then
+		make && make install
+		echo -e "\033[32mThe $P_FILES_DIR install success\033[0m"
+	else
+		echo -e "\033[31mThe $P_FILES_DIR install error,Please check\033[0m"
 		exit
 	fi
 fi 
